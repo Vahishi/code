@@ -1,0 +1,219 @@
+﻿@page
+@model ConvertToPdfAndExcel.Pages.ConvertPageModel
+@{
+    ViewData["Title"] = "Convert Page";
+}
+
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        margin: 0; /* Remove body margin */
+    }
+
+    .content {
+        margin: 25px; /* Margin for content area */
+        margin-bottom: 100px; /* Increased bottom margin to avoid overlap */
+        font-size: 14px; /* Set the font size */
+    }
+
+    .title {
+        color: #2E8BC0; /* Set title color */
+        text-align: center;
+        font-size: 28px; /* Adjust title font size */
+        font-weight: bold; /* Make title bold */
+        margin-top: 20px; /* Space above title */
+    }
+
+    .info-box {
+        display: flex;
+        justify-content: space-between;
+        margin: 20px 0;
+        border: 1px solid black; /* Add border to the info box */
+        padding: 10px; /* Padding inside the box */
+    }
+
+    .info-left, .info-right {
+        width: 48%;
+        position: relative; /* For vertical line positioning */
+    }
+
+        .info-left p, .info-right p {
+            margin: 5px 0; /* Space between paragraphs */
+        }
+
+    .vertical-line {
+        border-left: 2px solid black; /* Vertical line */
+        margin: 0 10px; /* Space between the two boxes */
+    }
+
+    .dear-sir {
+        margin-top: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    table, th, td {
+        border: 1px solid black;
+    }
+
+    th {
+        background-color: #87CEEB; /* Sky blue background color for the header */
+        padding: 10px;
+    }
+
+    td {
+        padding: 8px;
+        text-align: left;
+    }
+
+    .amount-in-words {
+        color: blue; /* Set the text color of the amount in words */
+        font-weight: bold; /* Make it bold for emphasis */
+        text-align: center; /* Center align */
+        font-size: 16px; /* Increase font size */
+        margin-top: 20px; /* Space above */
+    }
+
+    .total-usd {
+        margin-top: 20px; /* Space above USD total */
+        text-align: right; /* Align to the right */
+    }
+
+    .nothing-follows {
+        text-align: center; /* Center align for the message */
+        margin: 10px 0; /* Space above and below */
+        font-style: italic; /* Italic style */
+    }
+
+    .export-buttons {
+        margin-top: 40px; /* Space above button */
+        text-align: center; /* Center align the buttons */
+    }
+
+    button {
+        padding: 10px 20px;
+        background-color: #2E8BC0;
+        color: white;
+        border: none;
+        cursor: pointer;
+        margin: 5px; /* Space between buttons */
+    }
+
+        button:hover {
+            background-color: #1B6FA5;
+        }
+</style>
+
+<div class="content">
+    <div class="title">PURCHASE ORDER</div>
+
+    <div class="info-box">
+        <div class="info-left">
+            <p><strong>To:</strong> @(string.IsNullOrEmpty(Model.PurchaseOrder.CompanyName) ? "N/A" : Model.PurchaseOrder.CompanyName)</p>
+        </div>
+        <div class="vertical-line"></div> <!-- Vertical line separator -->
+        <div class="info-right">
+            <p><strong>P.O. No:</strong> @(string.IsNullOrEmpty(Model.PurchaseOrder.PONumber) ? "N/A" : Model.PurchaseOrder.PONumber)</p>
+            <p><strong>P.O. Date:</strong> @(Model.PurchaseOrder.PODate != DateTime.MinValue ? Model.PurchaseOrder.PODate.ToString("dd-MMM-yyyy") : "N/A")</p>
+            <p><strong>VAT No:</strong> @(string.IsNullOrEmpty(Model.PurchaseOrder.VATNo) ? "N/A" : Model.PurchaseOrder.VATNo)</p>
+            <p><strong>Project:</strong> @(string.IsNullOrEmpty(Model.PurchaseOrder.Project) ? "N/A" : Model.PurchaseOrder.Project)</p>
+        </div>
+    </div>
+
+    <p><strong>Attention:</strong> @(string.IsNullOrEmpty(Model.PurchaseOrder.Attention) ? "N/A" : Model.PurchaseOrder.Attention)</p>
+    <p><strong>Reference:</strong> @(string.IsNullOrEmpty(Model.PurchaseOrder.Reference) ? "N/A" : Model.PurchaseOrder.Reference)</p>
+    <p><strong>Subject:</strong> Purchase Order for Materials</p>
+
+    <div class="horizontal-line" style="border-top: 1px solid black; margin: 10px 0;"></div> <!-- Horizontal line below subject -->
+
+    <div class="dear-sir">
+        <p>Dear Sir,</p>
+        <p>With reference to your quotation, please be informed that we accepted your terms & conditions with the below prices as mentioned:</p>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Stock No.</th>
+                <th>Description & Specifications</th>
+                <th>Unit</th>
+                <th>Qty</th>
+                <th>Unit Price</th>
+                <th>Discount</th>
+                <th>VAT%</th>
+                <th>Amount Before Tax</th>
+                <th>VAT Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.PurchaseOrder.Items.Count; i++)
+            {
+                var item = Model.PurchaseOrder.Items[i];
+                <tr>
+                    <td>@(i + 1)</td> <!-- Serial number -->
+                    <td>@(string.IsNullOrEmpty(item.StockNumber) ? "N/A" : item.StockNumber)</td>
+                    <td>@(string.IsNullOrEmpty(item.Description) ? "N/A" : item.Description)</td>
+                    <td>@(string.IsNullOrEmpty(item.Unit) ? "N/A" : item.Unit)</td>
+                    <td>@item.Quantity</td>
+                    <td>@item.UnitPrice</td>
+                    <td>@item.Discount</td>
+                    <td>@item.VAT</td>
+                    <td>@item.AmountBeforeTax</td>
+                    <td>@item.VATAmount</td>
+                </tr>
+            }
+
+            <tr class="nothing-follows">
+                <td colspan="10">**** Nothing Follows *****</td>
+            </tr>
+            <tr>
+                <td colspan="8">Total Amount:</td>
+                <td>@Model.PurchaseOrder.TotalAmount</td>
+            </tr>
+            <tr>
+                <td colspan="8">Less: Discount:</td>
+                <td>@Model.PurchaseOrder.Discount</td>
+            </tr>
+            <tr>
+                <td colspan="8">Gross Total:</td>
+                <td>@(Model.PurchaseOrder.TotalAmount - Model.PurchaseOrder.Discount)</td>
+            </tr>
+            <tr>
+                <td colspan="8">VAT Amount:</td>
+                <td>@Model.PurchaseOrder.VATAmount</td>
+            </tr>
+            <tr>
+                <td colspan="8">Net Amount:</td>
+                <td>@Model.PurchaseOrder.NetAmount</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="amount-in-words">
+        Amount in Words: @Model.PurchaseOrder.AmountInWords
+    </div>
+
+    <div class="dear-sir">
+        <p>This Purchase Order is raised to order the items as listed and subject to provision attached/listed below and related to our procurement procedures. Please return a copy of this Purchase Order duly signed & stamped in acknowledgement of your receipt, acceptance & compliance to all the terms stated herein.</p>
+    </div>
+
+    <div class="total-usd">
+        <p><strong>Total in USD:</strong> @(Model.PurchaseOrder.TotalAmount * 0.27m)</p> <!-- Replace with appropriate conversion if needed -->
+    </div>
+
+    <div class="dear-sir">
+        <p>Thanks and Regards,</p>
+    </div>
+
+    <div class="export-buttons">
+        <button onclick="location.href='@Url.Page("ConvertPage", "ExportPdf")'">Export to PDF</button>
+        <button onclick="location.href='@Url.Page("ConvertPage", "ExportExcel")'">Export to Excel</button>
+        <button onclick="location.href='@Url.Page("ConvertPage", "ExportDoc")'">Export to Word</button>
+    </div>
+
+</div>
